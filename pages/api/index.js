@@ -1,10 +1,10 @@
 require('dotenv').config()
 const cloudinary = require('cloudinary').v2
 const app = require('express')()
-// const cors = require('cors')
+const cors = require('cors')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-// app.use(cors())
+app.use(cors())
 
 app.get('/api/folders', (req, res) => {
     console.log('get folders')
@@ -50,3 +50,5 @@ app.get('/album/:category/:name', (req, res) => {
 // const server = app.listen(process.env.PORT || 9000, () => {
 //     console.log('Listening on port %d', server.address().port)
 // })
+
+module.exports = app
