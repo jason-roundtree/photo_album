@@ -2,16 +2,14 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
+import formatDate from '../utils/formatDate'
+// TODO: why does require work here?
 const cloudinary = require('cloudinary').v2
 
-// export default (req, res) => {
-//     console.log(`zz req: `, req)
-    
-// }
 // import styles from '../styles/Home.module.css'
 
 async function getPhotoAlbum(folderPath) {
-  console.log(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
+  // console.log(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
   try {
     const res = await fetch(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
     if (res.ok) {
@@ -32,13 +30,14 @@ export default function Home({ albumPaths }) {
   console.log(`photoAlbums: `, photoAlbums)
 
   useEffect(() => {
+    // console.log(`useEffect`)
     const allPhotoAlbumPromises = photoAlbumPaths.map(({ path }) => {
-      getPhotoAlbum(path)
+      return getPhotoAlbum(path)
     })
-
     Promise.all(allPhotoAlbumPromises)
       .then(allPhotoAlbumData => {
         setPhotoAlbums(allPhotoAlbumData)
+
       })
       .catch(err => console.log('error resolving allPhotoAlbumPromises: ', err))
   }, [photoAlbumPaths])
@@ -55,7 +54,27 @@ export default function Home({ albumPaths }) {
         <h1>Photo Albums</h1>
 
         {/* <Link href='/photos'><a>Photos</a></Link> */}
-        
+        <ul>
+          {photoAlbums.map(({ resources }) => {
+            console.log(`resources: `, resources)
+            // TODO: tag and query preview image directly
+            if (resources.length) {
+              const { context } = resources[0]
+              
+              return (
+                <li key={resources[0].asset_id}>
+                  <p>{context.display_location}</p>
+                  <p>{formatDate(context.date)}</p>
+                  <img 
+                    src={resources[0].url}
+                    alt={context.display_location}
+                    width='300px'
+                  />
+                </li>
+              )
+            }
+          })}
+        </ul>
       </main>
 
       <footer>
@@ -76,6 +95,7 @@ export default function Home({ albumPaths }) {
 //   const paths
 // }
 
+// TODO: tag and query preview image directly
 export async function getStaticProps() {
   const albumPaths = await cloudinary
     .api
@@ -91,7 +111,7 @@ export async function getStaticProps() {
   // const a = await res.text()
   // console.log(`res: `, res)
   // const albumPaths = await res.json()
-  console.log(`albumPaths: `, albumPaths)
+  // console.log(`albumPaths: `, albumPaths)
   return {
     props: { albumPaths: albumPaths.folders }
   }

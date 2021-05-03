@@ -1,13 +1,13 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
-
 * {
   box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    margin: 2em;
 }
 
 a {
@@ -17,4 +17,15 @@ a {
 
 ul {
   list-style: none;
+  text-align: center;
 }
+
+li {
+  margin: 1.5em 0;
+}
+
+h1 {
+  margin-bottom: 1em;
+}
+
+

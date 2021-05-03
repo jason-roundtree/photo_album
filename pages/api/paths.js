@@ -1,7 +1,7 @@
 const cloudinary = require('cloudinary').v2
 
 export default (req, res) => {
-    console.log(`zz req: `, req)
+    // console.log(`paths.js req: `, req)
     cloudinary
         .api
         .sub_folders('outdoors', (err, _res) => {
