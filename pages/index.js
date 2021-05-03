@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
+const cloudinary = require('cloudinary').v2
+
+// export default (req, res) => {
+//     console.log(`zz req: `, req)
+    
+// }
 // import styles from '../styles/Home.module.css'
 
 async function getPhotoAlbum(folderPath) {
@@ -71,10 +77,20 @@ export default function Home({ albumPaths }) {
 // }
 
 export async function getStaticProps() {
-  const res = await fetch('https://photo-album-six.vercel.app/api/paths')
+  const albumPaths = await cloudinary
+    .api
+    .sub_folders('outdoors', (err, res) => {
+      if (!err) {
+        console.log('get folders res: ', res)
+        return res
+      } else {
+        console.log('error fetching subfolders: ', err)
+      }
+    })
+  // const res = await fetch('https://photo-album-six.vercel.app/api/paths')
   // const a = await res.text()
-  // console.log(`res.json(): `, a)
-  const albumPaths = await res.json()
+  // console.log(`res: `, res)
+  // const albumPaths = await res.json()
   console.log(`albumPaths: `, albumPaths)
   return {
     props: { albumPaths: albumPaths.folders }

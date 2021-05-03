@@ -11,7 +11,7 @@ const cors = initMiddleware(
 )
 
 export default async function handler(req, res) {
-    console.log('req', req)
+    console.log('albumName req', req)
     await cors(req, res)
 
     cloudinary
