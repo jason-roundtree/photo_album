@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
+import styled from 'styled-components'
 import formatDate from '../utils/formatDate'
 // TODO: why does require work here?
 const cloudinary = require('cloudinary').v2
 
-// import styles from '../styles/Home.module.css'
+const AlbumLocation = styled.p` color: rgb(255, 51, 126); `
+const AlbumDate = styled.p` color: rgb(255, 219, 232); `
 
 async function getPhotoAlbum(folderPath) {
   // console.log(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
@@ -40,7 +42,7 @@ export default function Home({ albumPaths }) {
 
       })
       .catch(err => console.log('error resolving allPhotoAlbumPromises: ', err))
-  }, [photoAlbumPaths])
+  }, [])
 
   return (
     <div>
@@ -48,28 +50,34 @@ export default function Home({ albumPaths }) {
         <title>Photo Albums</title>
         <meta name="description" content="Photography by Jason Roundtree" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </Head>
 
       <main>
         <h1>Photo Albums</h1>
 
-        {/* <Link href='/photos'><a>Photos</a></Link> */}
         <ul>
           {photoAlbums.map(({ resources }) => {
             console.log(`resources: `, resources)
             // TODO: tag and query preview image directly
             if (resources.length) {
-              const { context } = resources[0]
+              const { context, asset_id, url, folder:folderPath } = resources[0]
               
               return (
-                <li key={resources[0].asset_id}>
-                  <p>{context.display_location}</p>
-                  <p>{formatDate(context.date)}</p>
-                  <img 
-                    src={resources[0].url}
-                    alt={context.display_location}
-                    width='300px'
-                  />
+                <li key={asset_id}>
+                  <AlbumLocation>{context.display_location}</AlbumLocation>
+                  <AlbumDate>{formatDate(context.date)}</AlbumDate>
+                  
+                  <Link href={`/album/${folderPath}`}>
+                    <a>
+                      <img 
+                        src={url}
+                        alt={context.display_location}
+                        width='400px'
+                      />
+                    </a>
+                  </Link>
                 </li>
               )
             }
@@ -111,7 +119,7 @@ export async function getStaticProps() {
   // const a = await res.text()
   // console.log(`res: `, res)
   // const albumPaths = await res.json()
-  // console.log(`albumPaths: `, albumPaths)
+  console.log(`albumPaths: `, albumPaths)
   return {
     props: { albumPaths: albumPaths.folders }
   }
