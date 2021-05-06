@@ -9,18 +9,31 @@ export default function AlbumName(props) {
 }
 
 async function getPhotoAlbum(collection, name) {
+    const album = await cloudinary
+        .search
+        .expression(`${collection}/${name}/*`)
+        .with_field('context')
+        .execute()
+        .then(result => {
+            // console.log('folder path result: ', result)
+            return result
+        })
+        .catch(err => console.log('error: ', err))
+    
+    console.log(`album: `, album)
+    return album
     // console.log(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
-    try {
-        const res = await fetch(`https://photo-album-six.vercel.app/api/album/${collection}/${name}`)
-        if (res.ok) {
-            // console.log('getPhotoAlbum res: ', res)
-            return res.json()
-        } else {
-            throw new Error(res)
-        }
-    } catch(err) {
-        console.log(`error fetching ${collection}/${name} folder: `, err)
-    }
+    // try {
+    //     const res = await fetch(`https://photo-album-six.vercel.app/api/album/${collection}/${name}`)
+    //     if (res.ok) {
+    //         // console.log('getPhotoAlbum res: ', res)
+    //         return res.json()
+    //     } else {
+    //         throw new Error(res)
+    //     }
+    // } catch(err) {
+    //     console.log(`error fetching ${collection}/${name} folder: `, err)
+    // }
 }
 
 async function getAlbumPaths() {
@@ -48,7 +61,6 @@ export async function getStaticPaths() {
             }
         }
     })
-    console.log('x: ', pathData)
     return { 
         paths: pathData,
         fallback: false 
