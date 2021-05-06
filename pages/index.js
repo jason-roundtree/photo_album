@@ -11,7 +11,7 @@ const AlbumLocation = styled.p` color: rgb(255, 51, 126); `
 const AlbumDate = styled.p` color: rgb(255, 219, 232); `
 
 async function getPhotoAlbum(folderPath) {
-  // console.log(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
+  console.log(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
   try {
     const res = await fetch(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
     if (res.ok) {
@@ -61,26 +61,26 @@ export default function Home({ albumPaths }) {
           {photoAlbums.map((album) => {
             console.log(`album: `, album)
             // TODO: tag and query preview image directly
-            // if (resources.length) {
-            //   const { context, asset_id, url, folder:folderPath } = resources[0]
+            if (album.resources.length) {
+              const { context, asset_id, url, folder:folderPath } = resources[0]
               
-            //   return (
-            //     <li key={asset_id}>
-            //       <AlbumLocation>{context.display_location}</AlbumLocation>
-            //       <AlbumDate>{formatDate(context.date)}</AlbumDate>
+              return (
+                <li key={asset_id}>
+                  <AlbumLocation>{context.display_location}</AlbumLocation>
+                  <AlbumDate>{formatDate(context.date)}</AlbumDate>
                   
-            //       <Link href={`/album/${folderPath}`}>
-            //         <a>
-            //           <img 
-            //             src={url}
-            //             alt={context.display_location}
-            //             width='400px'
-            //           />
-            //         </a>
-            //       </Link>
-            //     </li>
-            //   )
-            // }
+                  <Link href={`/album/${folderPath}`}>
+                    <a>
+                      <img 
+                        src={url}
+                        alt={context.display_location}
+                        width='400px'
+                      />
+                    </a>
+                  </Link>
+                </li>
+              )
+            }
           })}
         </ul>
       </main>

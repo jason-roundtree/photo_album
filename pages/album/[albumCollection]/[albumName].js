@@ -19,7 +19,7 @@ async function getPhotoAlbum(collection, name) {
             throw new Error(res)
         }
     } catch(err) {
-        console.log(`error fetching ${folderPath} folder: `, err)
+        console.log(`error fetching ${collection}/${name} folder: `, err)
     }
 }
 
