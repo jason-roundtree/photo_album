@@ -58,11 +58,11 @@ export default function Home({ albumPaths }) {
         <h1>Photo Albums</h1>
 
         <ul>
-          {photoAlbums.map((album) => {
-            console.log(`album: `, album)
+          {photoAlbums.map(({ resources }) => {
+            console.log(`resources: `, resources)
             // TODO: tag and query preview image directly
-            if (album.resources.length) {
-              const { context, asset_id, url, folder:folderPath } = resources[0]
+            if (resources.length) {
+              const { context, asset_id, url, folder: folderPath } = resources[0]
               
               return (
                 <li key={asset_id}>
