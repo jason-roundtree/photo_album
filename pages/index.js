@@ -58,29 +58,29 @@ export default function Home({ albumPaths }) {
         <h1>Photo Albums</h1>
 
         <ul>
-          {photoAlbums.map(({ resources }) => {
-            console.log(`resources: `, resources)
+          {photoAlbums.map((album) => {
+            console.log(`album: `, album)
             // TODO: tag and query preview image directly
-            if (resources.length) {
-              const { context, asset_id, url, folder:folderPath } = resources[0]
+            // if (resources.length) {
+            //   const { context, asset_id, url, folder:folderPath } = resources[0]
               
-              return (
-                <li key={asset_id}>
-                  <AlbumLocation>{context.display_location}</AlbumLocation>
-                  <AlbumDate>{formatDate(context.date)}</AlbumDate>
+            //   return (
+            //     <li key={asset_id}>
+            //       <AlbumLocation>{context.display_location}</AlbumLocation>
+            //       <AlbumDate>{formatDate(context.date)}</AlbumDate>
                   
-                  <Link href={`/album/${folderPath}`}>
-                    <a>
-                      <img 
-                        src={url}
-                        alt={context.display_location}
-                        width='400px'
-                      />
-                    </a>
-                  </Link>
-                </li>
-              )
-            }
+            //       <Link href={`/album/${folderPath}`}>
+            //         <a>
+            //           <img 
+            //             src={url}
+            //             alt={context.display_location}
+            //             width='400px'
+            //           />
+            //         </a>
+            //       </Link>
+            //     </li>
+            //   )
+            // }
           })}
         </ul>
       </main>

@@ -53,9 +53,9 @@ export async function getStaticPaths() {
         paths: pathData,
         fallback: false 
     }
-  }
+}
   
-  export async function getStaticProps({ params: { albumCollection, albumName } }) {
+export async function getStaticProps({ params: { albumCollection, albumName } }) {
     // console.log(`getStaticProps params: `, params)
     const albumData = await getPhotoAlbum(albumCollection, albumName) 
     return {
@@ -65,4 +65,4 @@ export async function getStaticPaths() {
             albumName
         }
     }
-  }
+}

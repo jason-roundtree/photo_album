@@ -16,8 +16,7 @@ export default async function handler(req, res) {
 
     cloudinary
         .search
-        // .expression(`${req.query.albumCollection}/${req.query.albumName}/*`)
-        .expression('preview_image')
+        .expression(`${req.query.albumCollection}/${req.query.albumName}/*`)
         .with_field('context')
         .execute()
         .then(result => {
