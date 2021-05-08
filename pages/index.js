@@ -10,20 +10,21 @@ const cloudinary = require('cloudinary').v2
 const AlbumLocation = styled.p` color: rgb(255, 51, 126); `
 const AlbumDate = styled.p` color: rgb(255, 219, 232); `
 
-async function getPhotoAlbum(folderPath) {
-  console.log(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
-  try {
-    const res = await fetch(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
-    if (res.ok) {
-      // console.log('getPhotoAlbum res: ', res)
-      return res.json()
-    } else {
-      throw new Error(res)
-    }
-  } catch(err) {
-    console.log(`error fetching ${folderPath} folder: `, err)
-  }
-}
+// async function getPhotoAlbum(folderPath) {
+//   const album = await cloudinary
+//         .search
+//         .expression(`${collection}/${name}/*`)
+//         .with_field('context')
+//         .execute()
+//         .then(result => {
+//             // console.log('folder path result: ', result)
+//             return result
+//         })
+//         .catch(err => console.log('error: ', err))
+    
+//   console.log(`album index.js: `, album)
+//   return album
+// }
 
 export default function Home({ albumPaths }) {
   const [photoAlbumPaths, setPhotoAlbumPaths] = useState(albumPaths)
@@ -31,18 +32,18 @@ export default function Home({ albumPaths }) {
   console.log(`photoAlbumPaths: `, photoAlbumPaths)
   console.log(`photoAlbums: `, photoAlbums)
 
-  useEffect(() => {
-    // console.log(`useEffect`)
-    const allPhotoAlbumPromises = photoAlbumPaths.map(({ path }) => {
-      return getPhotoAlbum(path)
-    })
-    Promise.all(allPhotoAlbumPromises)
-      .then(allPhotoAlbumData => {
-        setPhotoAlbums(allPhotoAlbumData)
+  // useEffect(() => {
+  //   // console.log(`useEffect`)
+  //   const allPhotoAlbumPromises = photoAlbumPaths.map(({ path }) => {
+  //     return getPhotoAlbum(path)
+  //   })
+  //   Promise.all(allPhotoAlbumPromises)
+  //     .then(allPhotoAlbumData => {
+  //       setPhotoAlbums(allPhotoAlbumData)
 
-      })
-      .catch(err => console.log('error resolving allPhotoAlbumPromises: ', err))
-  }, [])
+  //     })
+  //     .catch(err => console.log('error resolving allPhotoAlbumPromises: ', err))
+  // }, [])
 
   return (
     <div>
@@ -96,31 +97,60 @@ export default function Home({ albumPaths }) {
   )
 }
 
-// export async function getStaticPaths() {
-//   const res = await fetch('https://photo-album-six.vercel.app/api/albumPaths')
-//   console.log(`res: `, res)
-//   const albumPaths = await res.json()
-//   const paths
-// }
+async function getPhotoAlbum(collection, name) {
+  console.log('getPhotoAlbum: ', collection, name)
+  const album = await cloudinary
+    .search
+    .expression(`${collection}/${name}/*`)
+    .with_field('context')
+    .execute()
+    .then(result => {
+        // console.log('folder path result: ', result)
+        console.log('getPhotoAlbum return')
+        return result
+    })
+    .catch(err => console.log('error: ', err))
+
+    // console.log(`album index.js`)
+
+    console.log(`album index.js: `, album.resources[0])
+  return album
+  // return album
+  // album
+  //   .then(data => {
+  //     // console.log(`data: `, data)
+  //     return data
+  //   })
+  //   .catch(err => console.log('getPhotoAlbum error: ', err))
+}
 
 // TODO: tag and query preview image directly
 export async function getStaticProps() {
-  const albumPaths = await cloudinary
+  const { folders: albumPaths } = await cloudinary
     .api
     .sub_folders('outdoors', (err, res) => {
       if (!err) {
-        console.log('get folders res: ', res)
+        // console.log('get folders res: ', res)
         return res
       } else {
         console.log('error fetching subfolders: ', err)
       }
     })
-  // const res = await fetch('https://photo-album-six.vercel.app/api/paths')
-  // const a = await res.text()
-  // console.log(`res: `, res)
-  // const albumPaths = await res.json()
   console.log(`albumPaths: `, albumPaths)
+  // TODO: is Promise.all needed here?
+  const albumData = await Promise.all(albumPaths.map(({ name, path }) => {
+    return getPhotoAlbum(path.split('/')[0], name)
+  }))
+    .then(data => {
+      console.log('dataaaa: ', data)
+      return data
+    })
+    .catch(err => console.log('Error fetching photo album from getStaticProps: ', err))
+  console.log(`getStaticProps albumData: `, albumData)
+
   return {
-    props: { albumPaths: albumPaths.folders }
+    props: { 
+      albumData: albumData
+    }
   }
 }

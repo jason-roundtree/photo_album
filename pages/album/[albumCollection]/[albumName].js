@@ -70,6 +70,7 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params: { albumCollection, albumName } }) {
     // console.log(`getStaticProps params: `, params)
     const albumData = await getPhotoAlbum(albumCollection, albumName) 
+    console.log(`albumData: `, albumData)
     return {
         props: { 
             albumData,
