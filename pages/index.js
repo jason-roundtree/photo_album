@@ -26,10 +26,10 @@ const AlbumDate = styled.p` color: rgb(255, 219, 232); `
 //   return album
 // }
 
-export default function Home({ albumPaths }) {
-  const [photoAlbumPaths, setPhotoAlbumPaths] = useState(albumPaths)
-  const [photoAlbums, setPhotoAlbums] = useState([])
-  console.log(`photoAlbumPaths: `, photoAlbumPaths)
+export default function Home({ albumData }) {
+  // const [photoAlbumPaths, setPhotoAlbumPaths] = useState(albumPaths)
+  const [photoAlbums, setPhotoAlbums] = useState(albumData)
+  // console.log(`photoAlbumPaths: `, photoAlbumPaths)
   console.log(`photoAlbums: `, photoAlbums)
 
   // useEffect(() => {
@@ -113,7 +113,7 @@ async function getPhotoAlbum(collection, name) {
 
     // console.log(`album index.js`)
 
-    console.log(`album index.js: `, album.resources[0])
+    // console.log(`album index.js: `, album.resources[0])
   return album
   // return album
   // album
@@ -142,15 +142,29 @@ export async function getStaticProps() {
     return getPhotoAlbum(path.split('/')[0], name)
   }))
     .then(data => {
-      console.log('dataaaa: ', data)
+      // console.log('dataaaa: ', data)
+      console.log('dataaaa')
       return data
     })
     .catch(err => console.log('Error fetching photo album from getStaticProps: ', err))
-  console.log(`getStaticProps albumData: `, albumData)
-
+  // console.log(`getStaticProps albumData: `, albumData)
+  console.log(`getStaticProps albumData`)
+  
+  const serializedAlbumData = albumData.map(({ resources }) => {
+    let folderPath = resources[0].folder
+    let date = resources[0].context.date
+    
+    return {
+      folderPath,
+      date,
+      resources
+    }
+  })
+  console.log(`serializedAlbumData: `, serializedAlbumData)
+  
   return {
     props: { 
-      albumData: albumData
+      albumData: serializedAlbumData
     }
   }
 }
