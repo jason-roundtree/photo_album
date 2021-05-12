@@ -10,39 +10,14 @@ const cloudinary = require('cloudinary').v2
 const AlbumLocation = styled.p` color: rgb(255, 51, 126); `
 const AlbumDate = styled.p` color: rgb(255, 219, 232); `
 
-// async function getPhotoAlbum(folderPath) {
-//   const album = await cloudinary
-//         .search
-//         .expression(`${collection}/${name}/*`)
-//         .with_field('context')
-//         .execute()
-//         .then(result => {
-//             // console.log('folder path result: ', result)
-//             return result
-//         })
-//         .catch(err => console.log('error: ', err))
-    
-//   console.log(`album index.js: `, album)
-//   return album
-// }
-
 export default function Home({ albumData }) {
   // const [photoAlbumPaths, setPhotoAlbumPaths] = useState(albumPaths)
   const [photoAlbums, setPhotoAlbums] = useState(albumData)
   // console.log(`photoAlbumPaths: `, photoAlbumPaths)
-  console.log(`photoAlbums: `, photoAlbums)
+  // console.log(`photoAlbums: `, photoAlbums)
 
   // useEffect(() => {
   //   // console.log(`useEffect`)
-  //   const allPhotoAlbumPromises = photoAlbumPaths.map(({ path }) => {
-  //     return getPhotoAlbum(path)
-  //   })
-  //   Promise.all(allPhotoAlbumPromises)
-  //     .then(allPhotoAlbumData => {
-  //       setPhotoAlbums(allPhotoAlbumData)
-
-  //     })
-  //     .catch(err => console.log('error resolving allPhotoAlbumPromises: ', err))
   // }, [])
 
   return (
@@ -60,10 +35,15 @@ export default function Home({ albumData }) {
 
         <ul>
           {photoAlbums.map(({ resources }) => {
-            console.log(`resources: `, resources)
+            // console.log(`resources: `, resources)
             // TODO: tag and query preview image directly
             if (resources.length) {
-              const { context, asset_id, url, folder: folderPath } = resources[0]
+              const { 
+                context = '', 
+                folder: folderPath,
+                asset_id, 
+                url, 
+              } = resources[0]
               
               return (
                 <li key={asset_id}>
@@ -98,30 +78,21 @@ export default function Home({ albumData }) {
 }
 
 async function getPhotoAlbum(collection, name) {
-  console.log('getPhotoAlbum: ', collection, name)
+  console.log('getPhotoAlbum: ', `${collection}/${name}`)
   const album = await cloudinary
     .search
     .expression(`${collection}/${name}/*`)
     .with_field('context')
     .execute()
     .then(result => {
-        // console.log('folder path result: ', result)
-        console.log('getPhotoAlbum return')
+        // console.log('getPhotoAlbum return')
         return result
     })
     .catch(err => console.log('error: ', err))
-
     // console.log(`album index.js`)
-
     // console.log(`album index.js: `, album.resources[0])
+
   return album
-  // return album
-  // album
-  //   .then(data => {
-  //     // console.log(`data: `, data)
-  //     return data
-  //   })
-  //   .catch(err => console.log('getPhotoAlbum error: ', err))
 }
 
 // TODO: tag and query preview image directly
@@ -130,38 +101,43 @@ export async function getStaticProps() {
     .api
     .sub_folders('outdoors', (err, res) => {
       if (!err) {
-        // console.log('get folders res: ', res)
+        console.log('folers res: ', res)
         return res
       } else {
         console.log('error fetching subfolders: ', err)
       }
     })
-  console.log(`albumPaths: `, albumPaths)
+  // console.log(`albumPaths: `, albumPaths)
+  // console.log(`albumPaths`)
   // TODO: is Promise.all needed here?
-  const albumData = await Promise.all(albumPaths.map(({ name, path }) => {
-    return getPhotoAlbum(path.split('/')[0], name)
-  }))
+  const albumData = await Promise.all(
+    albumPaths.map(({ name, path }) => {
+      const collection = path.split('/')[0]
+      return getPhotoAlbum(collection, name)
+    }))
     .then(data => {
       // console.log('dataaaa: ', data)
-      console.log('dataaaa')
+      // console.log('dataaaa')
       return data
     })
     .catch(err => console.log('Error fetching photo album from getStaticProps: ', err))
   // console.log(`getStaticProps albumData: `, albumData)
-  console.log(`getStaticProps albumData`)
+  // console.log(`getStaticProps albumData`)
   
   const serializedAlbumData = albumData.map(({ resources }) => {
+    // const serializedAlbumData = albumData.map(album => {
+    console.log(`resources[0]: `, resources[0])
+    // const resources = album.resources
     let folderPath = resources[0].folder
-    let date = resources[0].context.date
-    
+    let date = resources[0]?.context?.date
     return {
-      folderPath,
-      date,
-      resources
+      folderPath: folderPath || '',
+      date: date || '',
+      resources: resources
     }
   })
-  console.log(`serializedAlbumData: `, serializedAlbumData)
-  
+  // console.log(`serializedAlbumData: `, serializedAlbumData)
+
   return {
     props: { 
       albumData: serializedAlbumData
