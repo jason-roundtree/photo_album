@@ -22,18 +22,6 @@ async function getPhotoAlbum(collection, name) {
     
     console.log(`album: `, album)
     return album
-    // console.log(`https://photo-album-six.vercel.app/api/album/${folderPath}`)
-    // try {
-    //     const res = await fetch(`https://photo-album-six.vercel.app/api/album/${collection}/${name}`)
-    //     if (res.ok) {
-    //         // console.log('getPhotoAlbum res: ', res)
-    //         return res.json()
-    //     } else {
-    //         throw new Error(res)
-    //     }
-    // } catch(err) {
-    //     console.log(`error fetching ${collection}/${name} folder: `, err)
-    // }
 }
 
 async function getAlbumPaths() {

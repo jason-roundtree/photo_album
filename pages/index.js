@@ -4,21 +4,15 @@ import Link from 'next/link'
 import Image from 'next/image'
 import styled from 'styled-components'
 import formatDate from '../utils/formatDate'
-// TODO: why does require work here?
-const cloudinary = require('cloudinary').v2
+// TODO: which package should i be using? the commented out line below was working until adding 
+// const cloudinary = require('cloudinary').v2
+const cloudinary = require('cloudinary/lib/cloudinary').v2
 
 const AlbumLocation = styled.p` color: rgb(255, 51, 126); `
 const AlbumDate = styled.p` color: rgb(255, 219, 232); `
 
-export default function Home({ albumData }) {
-  // const [photoAlbumPaths, setPhotoAlbumPaths] = useState(albumPaths)
-  const [photoAlbums, setPhotoAlbums] = useState(albumData)
-  // console.log(`photoAlbumPaths: `, photoAlbumPaths)
-  // console.log(`photoAlbums: `, photoAlbums)
-
-  // useEffect(() => {
-  //   // console.log(`useEffect`)
-  // }, [])
+export default function Home({ previewData }) {
+  const [photoAlbumPreviews, setPhotoAlbumPreviews] = useState(previewData)
 
   return (
     <div>
@@ -34,7 +28,7 @@ export default function Home({ albumData }) {
         <h1>Photo Albums</h1>
 
         <ul>
-          {photoAlbums.map(({ resources }) => {
+          {photoAlbumPreviews.map(({ resources }) => {
             // console.log(`resources: `, resources)
             // TODO: tag and query preview image directly
             if (resources.length) {
@@ -84,18 +78,36 @@ async function getPhotoAlbum(collection, name) {
     .expression(`${collection}/${name}/*`)
     .with_field('context')
     .execute()
-    .then(result => {
+    .then(res => {
         // console.log('getPhotoAlbum return')
-        return result
+        return res
     })
-    .catch(err => console.log('error: ', err))
+    .catch(err => console.log('error querying for photo album: ', err))
     // console.log(`album index.js`)
     // console.log(`album index.js: `, album.resources[0])
 
   return album
 }
 
-// TODO: tag and query preview image directly
+async function getPreviewImage(collection, name) {
+  console.log('getPreviewImage: ', `${collection}/${name}`)
+  const previewImageData = await cloudinary
+    .search
+    .expression(`
+        ${collection}/${name}/*
+        AND
+        context:preview_image
+    `)
+    .with_field('context')
+    .execute()
+    .then(data => {
+        console.log('getPreviewImage data: ', data)
+        return data
+    })
+    .catch(err => console.log('error querying for preview image: ', err))
+  return previewImageData
+}
+
 export async function getStaticProps() {
   const { folders: albumPaths } = await cloudinary
     .api
@@ -110,37 +122,38 @@ export async function getStaticProps() {
   // console.log(`albumPaths: `, albumPaths)
   // console.log(`albumPaths`)
   // TODO: is Promise.all needed here?
-  const albumData = await Promise.all(
+  const albumsPreviewData = await Promise.all(
     albumPaths.map(({ name, path }) => {
       const collection = path.split('/')[0]
-      return getPhotoAlbum(collection, name)
+      // return getPhotoAlbum(collection, name)
+      return getPreviewImage(collection, name)
     }))
     .then(data => {
-      // console.log('dataaaa: ', data)
+      console.log('preview image data: ', data)
       // console.log('dataaaa')
       return data
     })
     .catch(err => console.log('Error fetching photo album from getStaticProps: ', err))
   // console.log(`getStaticProps albumData: `, albumData)
   // console.log(`getStaticProps albumData`)
-  
-  const serializedAlbumData = albumData.map(({ resources }) => {
-    // const serializedAlbumData = albumData.map(album => {
-    console.log(`resources[0]: `, resources[0])
-    // const resources = album.resources
-    let folderPath = resources[0].folder
-    let date = resources[0]?.context?.date
-    return {
-      folderPath: folderPath || '',
-      date: date || '',
-      resources: resources
+  const serializedPreviewData = []
+  albumsPreviewData.forEach(({ resources }) => {
+    // console.log(`resources[0]: `, resources[0])
+    if (resources[0]) {
+      let folderPath = resources[0].folder
+      let date = resources[0]?.context?.date
+      serializedPreviewData.push({
+        folderPath: folderPath || '',
+        date: date || '',
+        resources: resources
+      })
     }
   })
-  // console.log(`serializedAlbumData: `, serializedAlbumData)
+  console.log(`serializedPreviewData: `, serializedPreviewData)
 
   return {
     props: { 
-      albumData: serializedAlbumData
+      previewData: serializedPreviewData
     }
   }
 }
