@@ -1,10 +1,38 @@
 import styled from 'styled-components'
 const cloudinary = require('cloudinary').v2
+import formatDate from '../../../utils/formatDate'
+
+const GridContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+`
+const Image = styled.img`
+
+`
 
 export default function AlbumName(props) {
     console.log(`props: `, props)
     return (
-        <h2>Album: {props.albumName}</h2>
+        <>
+            <h2>{props.albumImages[0].display_location}</h2>
+            <h3>{formatDate(props.albumImages[0].date)}</h3>
+            <GridContainer>
+                {/* <ul> */}
+                    {props.albumImages.map(image => {
+                        return (
+                            <Image
+                                src={image.url}
+                                alt={`
+                                    Photo of ${image.display_location} on ${image.date}
+                                `}
+                                width='400px'
+                            />
+                        )
+                    })}
+                {/* </ul> */}
+            </GridContainer>
+        </>
     )
 }
 
@@ -15,12 +43,12 @@ async function getPhotoAlbum(collection, name) {
         .with_field('context')
         .execute()
         .then(result => {
-            // console.log('folder path result: ', result)
+            console.log('folder path result: ', result)
             return result
         })
         .catch(err => console.log('error: ', err))
     
-    console.log(`album: `, album)
+    // console.log(`album: `, album)
     return album
 }
 
@@ -56,14 +84,21 @@ export async function getStaticPaths() {
 }
   
 export async function getStaticProps({ params: { albumCollection, albumName } }) {
-    // console.log(`getStaticProps params: `, params)
-    const albumData = await getPhotoAlbum(albumCollection, albumName) 
-    console.log(`albumData: `, albumData)
+    // console.log(`getStaticProps albumCollection/albumName: `, albumCollection, albumName)
+    const { resources: albumImages } = await getPhotoAlbum(albumCollection, albumName) 
+    console.log(`albumImages: `, albumImages)
+    const albumImagesSerialized = albumImages.map(image => {
+        const context = image?.context
+        return {
+            url: image.url,
+            id: image.asset_id,
+            display_location: context.display_location,
+            date: context.date
+        }
+    })
     return {
         props: { 
-            albumData,
-            // TODO: extract album name from `resources` instead of this name/id
-            albumName
+            albumImages: albumImagesSerialized
         }
     }
 }

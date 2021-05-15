@@ -48,7 +48,9 @@ export default function Home({ previewData }) {
                     <a>
                       <img 
                         src={url}
-                        alt={context.display_location}
+                        alt={`
+                          Preview image of photo album from ${context.display_location} on ${context.date}
+                        `}
                         width='400px'
                       />
                     </a>
@@ -136,18 +138,19 @@ export async function getStaticProps() {
     .catch(err => console.log('Error fetching photo album from getStaticProps: ', err))
   // console.log(`getStaticProps albumData: `, albumData)
   // console.log(`getStaticProps albumData`)
-  const serializedPreviewData = []
-  albumsPreviewData.forEach(({ resources }) => {
-    // console.log(`resources[0]: `, resources[0])
-    if (resources[0]) {
+  const serializedPreviewData = albumsPreviewData
+    .filter(({ resources }) => {
+      if (!resources[0]) { return false }
+      return true
+    })
+    .map(({ resources }) => {
       let folderPath = resources[0].folder
       let date = resources[0]?.context?.date
-      serializedPreviewData.push({
+      return {
         folderPath: folderPath || '',
         date: date || '',
         resources: resources
-      })
-    }
+      }
   })
   console.log(`serializedPreviewData: `, serializedPreviewData)
 
