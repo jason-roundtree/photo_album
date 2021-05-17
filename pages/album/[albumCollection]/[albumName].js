@@ -1,37 +1,35 @@
-import styled from 'styled-components'
 const cloudinary = require('cloudinary').v2
+import styled from 'styled-components'
 import formatDate from '../../../utils/formatDate'
 
-const GridContainer = styled.div`
+const FlexContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: center;
+    padding: 0 2em;
 `
 const Image = styled.img`
-
+    height: 300px;
+    margin: 10px;
 `
 
-export default function AlbumName(props) {
-    console.log(`props: `, props)
+export default function AlbumName({ albumImages }) {
+    // console.log(`albumImages: `, albumImages)
     return (
         <>
-            <h2>{props.albumImages[0].display_location}</h2>
-            <h3>{formatDate(props.albumImages[0].date)}</h3>
-            <GridContainer>
-                {/* <ul> */}
-                    {props.albumImages.map(image => {
-                        return (
-                            <Image
-                                src={image.url}
-                                alt={`
-                                    Photo of ${image.display_location} on ${image.date}
-                                `}
-                                width='400px'
-                            />
-                        )
-                    })}
-                {/* </ul> */}
-            </GridContainer>
+            <h2>{albumImages[0].display_location}</h2>
+            <h3>{formatDate(albumImages[0].date)}</h3>
+            <FlexContainer>
+                {albumImages.map(image => {
+                    return (
+                        <Image
+                            src={image.url}
+                            alt={`Photo of ${image.display_location} on ${image.date}`}
+                            key={image.id}
+                        />
+                    )
+                })}
+            </FlexContainer>
         </>
     )
 }
@@ -43,12 +41,10 @@ async function getPhotoAlbum(collection, name) {
         .with_field('context')
         .execute()
         .then(result => {
-            console.log('folder path result: ', result)
             return result
         })
         .catch(err => console.log('error: ', err))
     
-    // console.log(`album: `, album)
     return album
 }
 
@@ -63,12 +59,12 @@ async function getAlbumPaths() {
                 console.log('error fetching subfolders: ', err)
             }
         })
+
     return albumPaths
 }
 
 export async function getStaticPaths() {
     const albumNameAndPath = await getAlbumPaths()
-    console.log(`albumNameAndPath: `, albumNameAndPath)
     const pathData = albumNameAndPath.map(({ name, path }) => {
         return {
             params: {
@@ -77,6 +73,7 @@ export async function getStaticPaths() {
             }
         }
     })
+
     return { 
         paths: pathData,
         fallback: false 
@@ -84,18 +81,24 @@ export async function getStaticPaths() {
 }
   
 export async function getStaticProps({ params: { albumCollection, albumName } }) {
-    // console.log(`getStaticProps albumCollection/albumName: `, albumCollection, albumName)
     const { resources: albumImages } = await getPhotoAlbum(albumCollection, albumName) 
-    console.log(`albumImages: `, albumImages)
-    const albumImagesSerialized = albumImages.map(image => {
-        const context = image?.context
+    let context
+    const albumImagesSerialized = albumImages.filter(image => {
+        console.log('image: ', image)
+        context = image?.context
+        if (context.isPrivate) {
+            return false
+        }
+        return true
+    }).map(filteredImage => {
         return {
-            url: image.url,
-            id: image.asset_id,
-            display_location: context.display_location,
-            date: context.date
+            url: filteredImage.url,
+            id: filteredImage.asset_id,
+            display_location: context.display_location || '',
+            date: context.date || '',
         }
     })
+
     return {
         props: { 
             albumImages: albumImagesSerialized

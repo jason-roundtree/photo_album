@@ -48,9 +48,7 @@ export default function Home({ previewData }) {
                     <a>
                       <img 
                         src={url}
-                        alt={`
-                          Preview image of photo album from ${context.display_location} on ${context.date}
-                        `}
+                        alt={`Preview image of photo album from ${context.display_location} on ${context.date}`}
                         width='400px'
                       />
                     </a>
@@ -74,25 +72,20 @@ export default function Home({ previewData }) {
 }
 
 async function getPhotoAlbum(collection, name) {
-  console.log('getPhotoAlbum: ', `${collection}/${name}`)
   const album = await cloudinary
     .search
     .expression(`${collection}/${name}/*`)
     .with_field('context')
     .execute()
     .then(res => {
-        // console.log('getPhotoAlbum return')
         return res
     })
     .catch(err => console.log('error querying for photo album: ', err))
-    // console.log(`album index.js`)
-    // console.log(`album index.js: `, album.resources[0])
 
   return album
 }
 
 async function getPreviewImage(collection, name) {
-  console.log('getPreviewImage: ', `${collection}/${name}`)
   const previewImageData = await cloudinary
     .search
     .expression(`
@@ -103,10 +96,10 @@ async function getPreviewImage(collection, name) {
     .with_field('context')
     .execute()
     .then(data => {
-        console.log('getPreviewImage data: ', data)
         return data
     })
     .catch(err => console.log('error querying for preview image: ', err))
+
   return previewImageData
 }
 
@@ -121,23 +114,17 @@ export async function getStaticProps() {
         console.log('error fetching subfolders: ', err)
       }
     })
-  // console.log(`albumPaths: `, albumPaths)
-  // console.log(`albumPaths`)
-  // TODO: is Promise.all needed here?
+    
   const albumsPreviewData = await Promise.all(
     albumPaths.map(({ name, path }) => {
       const collection = path.split('/')[0]
-      // return getPhotoAlbum(collection, name)
       return getPreviewImage(collection, name)
     }))
     .then(data => {
-      console.log('preview image data: ', data)
-      // console.log('dataaaa')
       return data
     })
     .catch(err => console.log('Error fetching photo album from getStaticProps: ', err))
-  // console.log(`getStaticProps albumData: `, albumData)
-  // console.log(`getStaticProps albumData`)
+
   const serializedPreviewData = albumsPreviewData
     .filter(({ resources }) => {
       if (!resources[0]) { return false }
@@ -147,12 +134,12 @@ export async function getStaticProps() {
       let folderPath = resources[0].folder
       let date = resources[0]?.context?.date
       return {
-        folderPath: folderPath || '',
+        resources: resources,
+        folderPath: folderPath,
         date: date || '',
-        resources: resources
       }
   })
-  console.log(`serializedPreviewData: `, serializedPreviewData)
+  // console.log(`serializedPreviewData: `, serializedPreviewData)
 
   return {
     props: { 
