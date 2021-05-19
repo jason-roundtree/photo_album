@@ -121,13 +121,15 @@ export async function getStaticProps() {
       return getPreviewImage(collection, name)
     }))
     .then(data => {
+      // TODO: add a test to check if a previewImage hasn't been set? (e.g. total_count: 0)
+      // console.log('preview data: ', data.resources[0])
       return data
     })
     .catch(err => console.log('Error fetching photo album from getStaticProps: ', err))
 
   const serializedPreviewData = albumsPreviewData
     .filter(({ resources }) => {
-      if (!resources[0]) { return false }
+      if (!resources[0]) return false
       return true
     })
     .map(({ resources }) => {

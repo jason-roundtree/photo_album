@@ -1,8 +1,10 @@
 const cloudinary = require('cloudinary').v2
+import { useState } from 'react'
 import styled from 'styled-components'
+import Modal from '../../../components/Modal'
 import formatDate from '../../../utils/formatDate'
 
-const FlexContainer = styled.div`
+const AlbumContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -14,22 +16,47 @@ const Image = styled.img`
 `
 
 export default function AlbumName({ albumImages }) {
+    const [modalImage, setModalImage] = useState({})
+    const [modalIsActive, setModalIsActive] = useState(false)
     // console.log(`albumImages: `, albumImages)
+
+    function handleLoadImageModal(imageData) {
+        console.log(`imageData: `, imageData)
+        setModalImage(imageData)
+        setModalIsActive(true)
+    }
+
     return (
         <>
             <h2>{albumImages[0].display_location}</h2>
             <h3>{formatDate(albumImages[0].date)}</h3>
-            <FlexContainer>
-                {albumImages.map(image => {
+            <AlbumContainer>
+                {albumImages.map(({ url, date, display_location, id }) => {
+                    const formattedDate = formatDate(date)
+                    const altText = `Photo of ${display_location} on ${formattedDate}`
                     return (
                         <Image
-                            src={image.url}
-                            alt={`Photo of ${image.display_location} on ${image.date}`}
-                            key={image.id}
+                            src={url}
+                            alt={altText}
+                            key={id}
+                            onClick={() => handleLoadImageModal({
+                                date: formattedDate,
+                                url,
+                                display_location,
+                                altText
+                            })}
                         />
                     )
                 })}
-            </FlexContainer>
+            </AlbumContainer>
+
+            {modalIsActive 
+                ? <Modal 
+                    image={modalImage} 
+                    setModalIsActive={setModalIsActive}
+                />
+                : ''
+            }
         </>
     )
 }
@@ -84,11 +111,10 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
     const { resources: albumImages } = await getPhotoAlbum(albumCollection, albumName) 
     let context
     const albumImagesSerialized = albumImages.filter(image => {
-        console.log('image: ', image)
+        // TODO: Add test for when no context exists
         context = image?.context
-        if (context.isPrivate) {
-            return false
-        }
+        // console.log('image/context: ', image, '\n ---- \n', context)
+        if (!context || context.isPrivate) return false
         return true
     }).map(filteredImage => {
         return {
