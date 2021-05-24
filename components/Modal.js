@@ -6,13 +6,14 @@ const Image = styled.img`
     height: 550px;
 `
 
-export default function Modal({ image, setModalIsActive }) {
+export default function Modal({ image, handleCloseImageModal }) {
     // console.log(`image: `, image)
     return (
         <AriaModal
             titleText="hi"
             initialFocus="#title"
-            onExit={() => setModalIsActive(false)}
+            // TODO: clear activeModalImage too:
+            onExit={handleCloseImageModal}
             underlayStyle={{ 
                 background: 'rgba(0, 0, 0, 0.9)',
                 paddingTop: '3em' 

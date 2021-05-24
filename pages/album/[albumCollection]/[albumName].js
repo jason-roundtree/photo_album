@@ -1,6 +1,7 @@
 const cloudinary = require('cloudinary').v2
 import { useState } from 'react'
 import styled from 'styled-components'
+import Gallery from 'react-photo-gallery'
 import Modal from '../../../components/Modal'
 import formatDate from '../../../utils/formatDate'
 
@@ -20,18 +21,49 @@ export default function AlbumName({ albumImages }) {
     const [modalIsActive, setModalIsActive] = useState(false)
     // console.log(`albumImages: `, albumImages)
 
-    function handleLoadImageModal(imageData) {
-        console.log(`imageData: `, imageData)
+    function handleOpenImageModal(e) {
+        const [ 
+            src, id, display_location, date, width, height, 
+        ] = Array.from(e.target.attributes)
+        // console.log('src: ', src)
+        const _display_location = display_location.nodeValue
+        const formattedDate = formatDate(date.nodeValue)
+        const imageData = {
+            url: src.nodeValue,
+            id: id.nodeValue,
+            display_location: _display_location.nodeValue,
+            date: formattedDate,
+            width: width.nodeValue,
+            height: height.nodeValue,
+            altText: `Photo of ${display_location} on ${formattedDate}`
+        }
         setModalImage(imageData)
         setModalIsActive(true)
+    }
+
+    function handleCloseImageModal() {
+        setModalImage({})
+        setModalIsActive(false)
     }
 
     return (
         <>
             <h2>{albumImages[0].display_location}</h2>
             <h3>{formatDate(albumImages[0].date)}</h3>
-            <AlbumContainer>
-                {albumImages.map(({ url, date, display_location, id }) => {
+            <Gallery 
+                photos={albumImages} 
+                margin={4}
+                onClick={handleOpenImageModal}
+            />
+            {/* <AlbumContainer>
+                {albumImages.map(({ 
+                    url, 
+                    date, 
+                    display_location, 
+                    id,
+                    width,
+                    height
+                }) => {
                     const formattedDate = formatDate(date)
                     const altText = `Photo of ${display_location} on ${formattedDate}`
                     return (
@@ -39,21 +71,23 @@ export default function AlbumName({ albumImages }) {
                             src={url}
                             alt={altText}
                             key={id}
-                            onClick={() => handleLoadImageModal({
+                            onClick={() => handleOpenImageModal({
                                 date: formattedDate,
                                 url,
                                 display_location,
-                                altText
+                                altText,
+                                width,
+                                height
                             })}
                         />
                     )
                 })}
-            </AlbumContainer>
+            </AlbumContainer> */}
 
             {modalIsActive 
                 ? <Modal 
                     image={modalImage} 
-                    setModalIsActive={setModalIsActive}
+                    handleCloseImageModal={handleCloseImageModal}
                 />
                 : ''
             }
@@ -118,10 +152,12 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
         return true
     }).map(filteredImage => {
         return {
-            url: filteredImage.url,
+            src: filteredImage.url,
             id: filteredImage.asset_id,
             display_location: context.display_location || '',
             date: context.date || '',
+            width: filteredImage.width,
+            height: filteredImage.height
         }
     })
 
