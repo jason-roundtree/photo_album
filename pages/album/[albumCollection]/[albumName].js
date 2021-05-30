@@ -5,16 +5,16 @@ import Gallery from 'react-photo-gallery'
 import Modal from '../../../components/Modal'
 import formatDate from '../../../utils/formatDate'
 
-const AlbumContainer = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 0 2em;
-`
-const Image = styled.img`
-    height: 300px;
-    margin: 10px;
-`
+// const AlbumContainer = styled.div`
+//     display: flex;
+//     flex-wrap: wrap;
+//     justify-content: center;
+//     padding: 0 2em;
+// `
+// const Image = styled.img`
+//     height: 300px;
+//     margin: 10px;
+// `
 
 export default function AlbumName({ albumImages }) {
     const [modalImage, setModalImage] = useState({})
@@ -22,21 +22,23 @@ export default function AlbumName({ albumImages }) {
     // console.log(`albumImages: `, albumImages)
 
     function handleOpenImageModal(e) {
+        // TODO: change how these values are being extracted so it doesn't rely on order
         const [ 
             src, id, display_location, date, width, height, 
         ] = Array.from(e.target.attributes)
-        // console.log('src: ', src)
         const _display_location = display_location.nodeValue
         const formattedDate = formatDate(date.nodeValue)
+
         const imageData = {
             url: src.nodeValue,
             id: id.nodeValue,
-            display_location: _display_location.nodeValue,
+            display_location: _display_location,
             date: formattedDate,
             width: width.nodeValue,
             height: height.nodeValue,
-            altText: `Photo of ${display_location} on ${formattedDate}`
+            altText: `Photo of ${_display_location} on ${formattedDate}`
         }
+
         setModalImage(imageData)
         setModalIsActive(true)
     }
@@ -55,40 +57,14 @@ export default function AlbumName({ albumImages }) {
                 margin={4}
                 onClick={handleOpenImageModal}
             />
-            {/* <AlbumContainer>
-                {albumImages.map(({ 
-                    url, 
-                    date, 
-                    display_location, 
-                    id,
-                    width,
-                    height
-                }) => {
-                    const formattedDate = formatDate(date)
-                    const altText = `Photo of ${display_location} on ${formattedDate}`
-                    return (
-                        <Image
-                            src={url}
-                            alt={altText}
-                            key={id}
-                            onClick={() => handleOpenImageModal({
-                                date: formattedDate,
-                                url,
-                                display_location,
-                                altText,
-                                width,
-                                height
-                            })}
-                        />
-                    )
-                })}
-            </AlbumContainer> */}
 
             {modalIsActive 
-                ? <Modal 
-                    image={modalImage} 
-                    handleCloseImageModal={handleCloseImageModal}
-                />
+                ? (
+                    <Modal 
+                        image={modalImage} 
+                        handleCloseImageModal={handleCloseImageModal}
+                    />
+                )
                 : ''
             }
         </>
@@ -114,7 +90,7 @@ async function getAlbumPaths() {
         .api
         .sub_folders('outdoors', (err, res) => {
             if (!err) {
-                console.log('get folders res: ', res)
+                // console.log('get folders res: ', res)
                 return res
             } else {
                 console.log('error fetching subfolders: ', err)
@@ -144,22 +120,39 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params: { albumCollection, albumName } }) {
     const { resources: albumImages } = await getPhotoAlbum(albumCollection, albumName) 
     let context
-    const albumImagesSerialized = albumImages.filter(image => {
-        // TODO: Add test for when no context exists
-        context = image?.context
-        // console.log('image/context: ', image, '\n ---- \n', context)
-        if (!context || context.isPrivate) return false
-        return true
-    }).map(filteredImage => {
-        return {
-            src: filteredImage.url,
-            id: filteredImage.asset_id,
-            display_location: context.display_location || '',
-            date: context.date || '',
-            width: filteredImage.width,
-            height: filteredImage.height
-        }
-    })
+    const baseImageUrl = 'http://res.cloudinary.com/daeedgezj/image/upload'
+    const albumImagesSerialized = albumImages
+        .filter(image => {
+            // TODO: Add test for when no context exists
+            context = image?.context
+            if (!context || context.isPrivate) return false
+            return true
+        })
+        .map(image => {
+            // console.log(`image: `, image)
+
+            // const lqipUrl = cloudinary.url(image.public_id, {transformation: [
+            //     {quality: "auto", fetch_format: "auto"},
+            //     {effect: "blur:700", quality: 1},
+            //     {effect: "cartoonify"}
+            // ]})
+
+            const baseImageOptimized = `${baseImageUrl}/f_auto/q_auto/w_auto`
+            const imagePathAndFormat = `${image.folder}/${image.filename}.${image.format}` 
+            const fullImageUrl = `${baseImageOptimized}/${imagePathAndFormat}`
+            // const lqipImageUrl = `${baseImageOptimized}/e_blur:1500,q_1/e_cartoonify/${imagePathAndFormat}`
+     
+            // NOTE: If you toggle lqip image or otherwise change the order of these properties you must also change the order of destructioning inside of the `handleOpenImageModal` function above
+            return {
+                src: fullImageUrl,
+                // lqip_src: lqipUrl,
+                id: image.asset_id,
+                display_location: context.display_location || '',
+                date: context.date || '',
+                width: image.width,
+                height: image.height
+            }
+        })
 
     return {
         props: { 
