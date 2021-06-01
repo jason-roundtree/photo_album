@@ -1,6 +1,8 @@
 const cloudinary = require('cloudinary').v2
 import { useState } from 'react'
 import styled from 'styled-components'
+import { CarouselProvider, Slider, Slide, Image, ButtonBack, ButtonNext, Dot } from 'pure-react-carousel'
+import 'pure-react-carousel/dist/react-carousel.es.css'
 import Gallery from 'react-photo-gallery'
 import Modal from '../../../components/Modal'
 import formatDate from '../../../utils/formatDate'
@@ -11,10 +13,18 @@ import formatDate from '../../../utils/formatDate'
 //     justify-content: center;
 //     padding: 0 2em;
 // `
-// const Image = styled.img`
-//     height: 300px;
-//     margin: 10px;
+// TODO: how to style pure-react-carousel's Image with Styled Components? This doesn't work:
+// const PRC_Image = ({ className, children }) => {
+//     return (
+//         <Image className={className}>
+//             {children}
+//         </Image>
+//     )
+// }
+// const StyledImage = styled(PRC_Image)`
+//     object-fit: contain;
 // `
+const CloseCarouselBtn = styled.button``
 
 export default function AlbumName({ albumImages }) {
     const [modalImage, setModalImage] = useState({})
@@ -22,6 +32,7 @@ export default function AlbumName({ albumImages }) {
     // console.log(`albumImages: `, albumImages)
 
     function handleOpenImageModal(e) {
+        // console.log('e: ', e.target)
         // TODO: change how these values are being extracted so it doesn't rely on order
         const [ 
             src, id, display_location, date, width, height, 
@@ -30,7 +41,7 @@ export default function AlbumName({ albumImages }) {
         const formattedDate = formatDate(date.nodeValue)
 
         const imageData = {
-            url: src.nodeValue,
+            src: src.nodeValue,
             id: id.nodeValue,
             display_location: _display_location,
             date: formattedDate,
@@ -60,10 +71,40 @@ export default function AlbumName({ albumImages }) {
 
             {modalIsActive 
                 ? (
-                    <Modal 
-                        image={modalImage} 
-                        handleCloseImageModal={handleCloseImageModal}
-                    />
+                    <CarouselProvider
+                        naturalSlideWidth={75}
+                        naturalSlideHeight={50}
+                        totalSlides={albumImages.length}
+                    >
+                        <Slider>
+                            {albumImages.map((img, i) => {
+                                console.log('img: ', img)
+                                return (
+                                    <Slide key={img.id}>
+                                        <Image 
+                                            src={img.src} 
+                                            alt={img.altText}
+                                            index={i}
+                                            id={img.id}
+                                            className='slideImage'
+                                            // width={img.width}
+                                            // height={img.height}
+                                        />
+                                    </Slide>
+                                )
+                            })}
+                        </Slider>
+
+                        <ButtonBack>Back</ButtonBack>
+                        <ButtonNext>Next</ButtonNext>
+                        <CloseCarouselBtn onClick={handleCloseImageModal}>
+                            Close
+                        </CloseCarouselBtn>
+                    </CarouselProvider>
+                    // <Modal 
+                    //     image={modalImage} 
+                    //     handleCloseImageModal={handleCloseImageModal}
+                    // />
                 )
                 : ''
             }
@@ -76,6 +117,8 @@ async function getPhotoAlbum(collection, name) {
         .search
         .expression(`${collection}/${name}/*`)
         .with_field('context')
+        // TODO: implement cursor for when max_results is more than 100?
+        .max_results(100)
         .execute()
         .then(result => {
             return result
@@ -119,6 +162,7 @@ export async function getStaticPaths() {
   
 export async function getStaticProps({ params: { albumCollection, albumName } }) {
     const { resources: albumImages } = await getPhotoAlbum(albumCollection, albumName) 
+    console.log(`albumImages.length: `, albumImages.length)
     let context
     const baseImageUrl = 'http://res.cloudinary.com/daeedgezj/image/upload'
     const albumImagesSerialized = albumImages
@@ -129,7 +173,7 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
             return true
         })
         .map(image => {
-            // console.log(`image: `, image)
+            console.log(`image.url: `, image.url)
 
             // const lqipUrl = cloudinary.url(image.public_id, {transformation: [
             //     {quality: "auto", fetch_format: "auto"},

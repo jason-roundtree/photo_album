@@ -31,3 +31,8 @@ li {
 h1 {
   margin-bottom: 1em;
 }
+
+.slideImage {
+  object-fit: contain;
+  border: 1px solid black;
+}

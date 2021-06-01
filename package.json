@@ -15,6 +15,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "next": "10.2.0",
+    "pure-react-carousel": "^1.27.6",
     "react": "17.0.2",
     "react-aria-modal": "^4.0.0",
     "react-dom": "17.0.2",

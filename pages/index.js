@@ -96,7 +96,7 @@ async function getPreviewImage(collection, name) {
     .with_field('context')
     .execute()
     .then(data => {
-      console.log('previewImage: ', data)
+      // console.log('previewImage: ', data)
       return data
     })
     .catch(err => console.log('error querying for preview image: ', err))
