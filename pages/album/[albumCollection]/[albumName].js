@@ -27,58 +27,41 @@ import formatDate from '../../../utils/formatDate'
 const CloseCarouselBtn = styled.button``
 
 export default function AlbumName({ albumImages }) {
-    const [modalImage, setModalImage] = useState({})
-    const [modalIsActive, setModalIsActive] = useState(false)
+    const [currentSlideIndex, setCurrentSlideIndex] = useState(null)
+    const [carouselIsActive, setCarouselIsActive] = useState(false)
     // console.log(`albumImages: `, albumImages)
 
-    function handleOpenImageModal(e) {
-        // console.log('e: ', e.target)
-        // TODO: change how these values are being extracted so it doesn't rely on order
-        const [ 
-            src, id, display_location, date, width, height, 
-        ] = Array.from(e.target.attributes)
-        const _display_location = display_location.nodeValue
-        const formattedDate = formatDate(date.nodeValue)
-
-        const imageData = {
-            src: src.nodeValue,
-            id: id.nodeValue,
-            display_location: _display_location,
-            date: formattedDate,
-            width: width.nodeValue,
-            height: height.nodeValue,
-            altText: `Photo of ${_display_location} on ${formattedDate}`
-        }
-
-        setModalImage(imageData)
-        setModalIsActive(true)
+    function handleOpenCarousel(e, imgData) {
+        setCurrentSlideIndex(imgData.index)
+        setCarouselIsActive(true)
     }
 
-    function handleCloseImageModal() {
-        setModalImage({})
-        setModalIsActive(false)
+    function handleCloseCarousel() {
+        setCurrentSlideIndex(null)
+        setCarouselIsActive(false)
     }
 
     return (
         <>
             <h2>{albumImages[0].display_location}</h2>
-            <h3>{formatDate(albumImages[0].date)}</h3>
+            <h3>{albumImages[0].date}</h3>
             <Gallery 
                 photos={albumImages} 
                 margin={4}
-                onClick={handleOpenImageModal}
+                onClick={handleOpenCarousel}
             />
 
-            {modalIsActive 
+            {carouselIsActive 
                 ? (
                     <CarouselProvider
                         naturalSlideWidth={75}
                         naturalSlideHeight={50}
                         totalSlides={albumImages.length}
+                        currentSlide={currentSlideIndex}
+                        className='carouselProvider'
                     >
                         <Slider>
                             {albumImages.map((img, i) => {
-                                console.log('img: ', img)
                                 return (
                                     <Slide key={img.id}>
                                         <Image 
@@ -87,8 +70,6 @@ export default function AlbumName({ albumImages }) {
                                             index={i}
                                             id={img.id}
                                             className='slideImage'
-                                            // width={img.width}
-                                            // height={img.height}
                                         />
                                     </Slide>
                                 )
@@ -97,13 +78,13 @@ export default function AlbumName({ albumImages }) {
 
                         <ButtonBack>Back</ButtonBack>
                         <ButtonNext>Next</ButtonNext>
-                        <CloseCarouselBtn onClick={handleCloseImageModal}>
+                        <CloseCarouselBtn onClick={handleCloseCarousel}>
                             Close
                         </CloseCarouselBtn>
                     </CarouselProvider>
                     // <Modal 
                     //     image={modalImage} 
-                    //     handleCloseImageModal={handleCloseImageModal}
+                    //     handleCloseCarousel={handleCloseCarousel}
                     // />
                 )
                 : ''
@@ -185,16 +166,17 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
             const imagePathAndFormat = `${image.folder}/${image.filename}.${image.format}` 
             const fullImageUrl = `${baseImageOptimized}/${imagePathAndFormat}`
             // const lqipImageUrl = `${baseImageOptimized}/e_blur:1500,q_1/e_cartoonify/${imagePathAndFormat}`
-     
+            const date = context.date ? formatDate(context.date ) : null
             // NOTE: If you toggle lqip image or otherwise change the order of these properties you must also change the order of destructioning inside of the `handleOpenImageModal` function above
             return {
                 src: fullImageUrl,
                 // lqip_src: lqipUrl,
                 id: image.asset_id,
                 display_location: context.display_location || '',
-                date: context.date || '',
+                date: date,
                 width: image.width,
-                height: image.height
+                height: image.height,
+                alt: `Photo of ${context.display_location} on ${date}`
             }
         })
 
