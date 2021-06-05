@@ -44,7 +44,7 @@ export default function AlbumName({ albumImages }) {
     return (
         <>
             <h2>{albumImages[0].display_location}</h2>
-            <h3>{albumImages[0].date}</h3>
+            {/* <h3>{albumImages[0].date}</h3> */}
             <Gallery 
                 photos={albumImages} 
                 margin={4}
@@ -166,7 +166,8 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
             const imagePathAndFormat = `${image.folder}/${image.filename}.${image.format}` 
             const fullImageUrl = `${baseImageOptimized}/${imagePathAndFormat}`
             // const lqipImageUrl = `${baseImageOptimized}/e_blur:1500,q_1/e_cartoonify/${imagePathAndFormat}`
-            const date = context.date ? formatDate(context.date ) : null
+            // const date = context.date ? formatDate(context.date) : null
+            const date = context.date ? context.date : null
             // NOTE: If you toggle lqip image or otherwise change the order of these properties you must also change the order of destructioning inside of the `handleOpenImageModal` function above
             return {
                 src: fullImageUrl,

@@ -42,7 +42,7 @@ export default function Home({ previewData }) {
               return (
                 <li key={asset_id}>
                   <AlbumLocation>{context.display_location}</AlbumLocation>
-                  <AlbumDate>{formatDate(context.date)}</AlbumDate>
+                  {/* <AlbumDate>{context.date}</AlbumDate> */}
                   
                   <Link href={`/album/${folderPath}`}>
                     <a>
@@ -60,13 +60,13 @@ export default function Home({ previewData }) {
         </ul>
       </main>
 
-      <footer>
+      {/* <footer> */}
         {/* <a
           target="_blank"
           rel="noopener noreferrer"
         >
         </a> */}
-      </footer>
+      {/* </footer> */}
     </div>
   )
 }
@@ -136,11 +136,16 @@ export async function getStaticProps() {
     .map(({ resources }) => {
       let folderPath = resources[0].folder
       let date = resources[0]?.context?.date
+      
       return {
         resources: resources,
         folderPath: folderPath,
         date: date || '',
       }
+  })
+  .sort((a, b) => {
+    console.log('date: ', a.date)
+    return b.date - a.date
   })
   // console.log(`serializedPreviewData: `, serializedPreviewData)
 
