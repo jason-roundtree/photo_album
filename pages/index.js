@@ -42,7 +42,7 @@ export default function Home({ previewData }) {
               return (
                 <li key={asset_id}>
                   <AlbumLocation>{context.display_location}</AlbumLocation>
-                  {/* <AlbumDate>{context.date}</AlbumDate> */}
+                  <AlbumDate>{formatDate(context.date).toDateString()}</AlbumDate>
                   
                   <Link href={`/album/${folderPath}`}>
                     <a>
@@ -136,7 +136,6 @@ export async function getStaticProps() {
     .map(({ resources }) => {
       let folderPath = resources[0].folder
       let date = resources[0]?.context?.date
-      
       return {
         resources: resources,
         folderPath: folderPath,
@@ -144,8 +143,8 @@ export async function getStaticProps() {
       }
   })
   .sort((a, b) => {
-    console.log('date: ', a.date)
-    return b.date - a.date
+    console.log('date: ', a.date, b.date)
+    return formatDate(b.date) - formatDate(a.date)
   })
   // console.log(`serializedPreviewData: `, serializedPreviewData)
 

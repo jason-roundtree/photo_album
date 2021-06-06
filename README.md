@@ -1,5 +1,5 @@
 ## TODOs
-- Style carousel 
+- Style carousel and overlay
 - Add image numbers to carousel (e.g. 3/7)
 - Find out how to order images in Cloudinary by order pictures were taken or sort by time pictures were taken (is this only possible with paid plan??)
 - Sort albums by date
