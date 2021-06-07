@@ -10,7 +10,12 @@ const cloudinary = require('cloudinary/lib/cloudinary').v2
 
 const AlbumLocation = styled.p` color: rgb(255, 51, 126); `
 const AlbumDate = styled.p` color: rgb(255, 219, 232); `
-
+const AlbumPreviewImg = styled.img`
+  width: 450px;
+  @media (max-width: 650px) {
+    width: 95%;  
+  }
+`
 export default function Home({ previewData }) {
   const [photoAlbumPreviews, setPhotoAlbumPreviews] = useState(previewData)
 
@@ -46,10 +51,9 @@ export default function Home({ previewData }) {
                   
                   <Link href={`/album/${folderPath}`}>
                     <a>
-                      <img 
+                      <AlbumPreviewImg 
                         src={url}
                         alt={`Preview image of photo album from ${context.display_location} on ${context.date}`}
-                        width='400px'
                       />
                     </a>
                   </Link>
