@@ -34,13 +34,77 @@ h1 {
 
 .slideImage {
   object-fit: contain;
-  border: 1px solid black;
+  /* border: 1px solid black; */
 }
 
-.carouselProvider {
-  position: absolute;
-  left: 0;
+/* TODO: prevent scrolling behind carousel */
+.carousel-overlay {
+  position: fixed;
   top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.carousel-provider {
+  position: relative;
+  width: 90vw;
+  /* max-height: 75vh; */
+}
+
+.carousel-nav-btn-container {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  top: 45%;
   width: 100%;
-  margin: 5px 0 5px 0;
+}
+
+.carousel-nav-btn-container button {
+  font-size: 1.5em;
+  opacity: .5;
+  color: azure;
+  background: rgb(11, 18, 11);
+  border: none;
+}
+
+.prev {
+  padding: 1px 5px 1px 2px;
+  /* position: relative; */
+  /* left: 0; */
+}
+.next {
+  padding: 1px 2px 1px 5px;
+  /* position: relative; */
+  /* right: 0; */
+}
+
+/* .prev:before,
+.next:before {
+  color: #fff;
+  font-size: 4em;
+  position: absolute;
+  top: 40%;
+  cursor: pointer;
+}
+
+.prev:before {
+  content: '<';
+  left: 0;
+}
+
+.next:before {
+  content: '>';
+  right: 0;
+} */
+
+
+@media (max-width: 650px) {
+  body {
+    margin: .75em;
+  }  
 }

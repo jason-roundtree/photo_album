@@ -1,35 +1,45 @@
 const cloudinary = require('cloudinary').v2
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { CarouselProvider, Slider, Slide, Image, ButtonBack, ButtonNext, Dot } from 'pure-react-carousel'
+import { CarouselProvider, Slider, Slide, Image as PRC_Image, ButtonBack, ButtonNext, Dot } from 'pure-react-carousel'
 import 'pure-react-carousel/dist/react-carousel.es.css'
 import Gallery from 'react-photo-gallery'
-import Modal from '../../../components/Modal'
 import formatDate from '../../../utils/formatDate'
 
-// const AlbumContainer = styled.div`
-//     display: flex;
-//     flex-wrap: wrap;
-//     justify-content: center;
-//     padding: 0 2em;
-// `
-// TODO: how to style pure-react-carousel's Image with Styled Components? This doesn't work:
-// const PRC_Image = ({ className, children }) => {
-//     return (
-//         <Image className={className}>
-//             {children}
-//         </Image>
-//     )
-// }
-// const StyledImage = styled(PRC_Image)`
-//     object-fit: contain;
-// `
-const CloseCarouselBtn = styled.button``
+// TODO: Why can't I use the 'Styling Any Component' method from Styled Components docs to style pure-react-carousel's components? 
+
+const ChangeSlideButtonWrapper = styled.span`
+    & button {
+        font-size: 1.2em;
+        padding: 10px;
+        border: none;
+    }
+`
+const CloseCarouselBtn = styled.button`
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 5px;
+    padding: 1px 5px;
+    font-size: 1.25em;
+    opacity: .5;
+    background: none;
+    border: none;
+    &:hover {
+        cursor: pointer;
+        background: rgb(11, 18, 11);
+        color: azure;
+    }
+`
 
 export default function AlbumName({ albumImages }) {
     const [currentSlideIndex, setCurrentSlideIndex] = useState(null)
     const [carouselIsActive, setCarouselIsActive] = useState(false)
     // console.log(`albumImages: `, albumImages)
+    useEffect(() => {
+        document.body.style.overflow = 'hidden'
+        return () => document.body.style.overflow = 'initial'
+    }, [])
 
     function handleOpenCarousel(e, imgData) {
         setCurrentSlideIndex(imgData.index)
@@ -44,7 +54,7 @@ export default function AlbumName({ albumImages }) {
     return (
         <>
             <h2>{albumImages[0].display_location}</h2>
-            <h3>{formatDate(albumImages[0].date).toDateString() }</h3>
+            <h3>{formatDate(albumImages[0].date).toDateString()}</h3>
             <Gallery 
                 photos={albumImages} 
                 margin={4}
@@ -53,39 +63,40 @@ export default function AlbumName({ albumImages }) {
 
             {carouselIsActive 
                 ? (
-                    <CarouselProvider
-                        naturalSlideWidth={75}
-                        naturalSlideHeight={50}
-                        totalSlides={albumImages.length}
-                        currentSlide={currentSlideIndex}
-                        className='carouselProvider'
-                    >
-                        <Slider>
-                            {albumImages.map((img, i) => {
-                                return (
-                                    <Slide key={img.id}>
-                                        <Image 
-                                            src={img.src} 
-                                            alt={img.altText}
-                                            index={i}
-                                            id={img.id}
-                                            className='slideImage'
-                                        />
-                                    </Slide>
-                                )
-                            })}
-                        </Slider>
+                    <div className='carousel-overlay'>
+                        <CarouselProvider
+                            naturalSlideWidth={75}
+                            naturalSlideHeight={50}
+                            totalSlides={albumImages.length}
+                            currentSlide={currentSlideIndex}
+                            className='carousel-provider'
+                        >
+                            <Slider>
+                                {albumImages.map((img, i) => {
+                                    return (
+                                        <Slide key={img.id} className='slide'>
+                                            <PRC_Image 
+                                                src={img.src} 
+                                                alt={img.altText}
+                                                index={i}
+                                                id={img.id}
+                                                className='slideImage'
+                                            />
+                                        </Slide>
+                                    )
+                                })}
+                            </Slider>
+                            
+                            <div className='carousel-nav-btn-container'>
+                                <ButtonBack className='prev'>&#8678;</ButtonBack>
+                                <ButtonNext className='next'>&#8680;</ButtonNext>
+                            </div>
 
-                        <ButtonBack>Back</ButtonBack>
-                        <ButtonNext>Next</ButtonNext>
-                        <CloseCarouselBtn onClick={handleCloseCarousel}>
-                            Close
-                        </CloseCarouselBtn>
-                    </CarouselProvider>
-                    // <Modal 
-                    //     image={modalImage} 
-                    //     handleCloseCarousel={handleCloseCarousel}
-                    // />
+                            <CloseCarouselBtn onClick={handleCloseCarousel}>
+                                &#215;
+                            </CloseCarouselBtn>
+                        </CarouselProvider>
+                    </div>
                 )
                 : ''
             }
@@ -177,7 +188,7 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
                 date: date,
                 width: image.width,
                 height: image.height,
-                alt: `Photo of ${context.display_location} on ${date}`
+                alt: `Photo of ${context.display_location} on ${formatDate(date).toDateString()}`
             }
         })
 
