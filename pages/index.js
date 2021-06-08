@@ -113,7 +113,7 @@ export async function getStaticProps() {
     .api
     .sub_folders('outdoors', (err, res) => {
       if (!err) {
-        console.log('folers res: ', res)
+        // console.log('folders res: ', res)
         return res
       } else {
         console.log('error fetching subfolders: ', err)
@@ -146,11 +146,7 @@ export async function getStaticProps() {
         date: date || '',
       }
   })
-  .sort((a, b) => {
-    console.log('date: ', a.date, b.date)
-    return formatDate(b.date) - formatDate(a.date)
-  })
-  // console.log(`serializedPreviewData: `, serializedPreviewData)
+  .sort((a, b) => formatDate(b.date) - formatDate(a.date))
 
   return {
     props: { 

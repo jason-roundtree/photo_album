@@ -52,8 +52,9 @@ h1 {
 
 .carousel-provider {
   position: relative;
-  width: 90vw;
-  /* max-height: 75vh; */
+  width: 85vw;
+  /* max-height: 95vh; */
+  /* padding: 10px 0; */
 }
 
 .carousel-nav-btn-container {
@@ -74,34 +75,11 @@ h1 {
 
 .prev {
   padding: 1px 5px 1px 2px;
-  /* position: relative; */
-  /* left: 0; */
 }
+
 .next {
   padding: 1px 2px 1px 5px;
-  /* position: relative; */
-  /* right: 0; */
 }
-
-/* .prev:before,
-.next:before {
-  color: #fff;
-  font-size: 4em;
-  position: absolute;
-  top: 40%;
-  cursor: pointer;
-}
-
-.prev:before {
-  content: '<';
-  left: 0;
-}
-
-.next:before {
-  content: '>';
-  right: 0;
-} */
-
 
 @media (max-width: 650px) {
   body {

@@ -8,13 +8,13 @@ import formatDate from '../../../utils/formatDate'
 
 // TODO: Why can't I use the 'Styling Any Component' method from Styled Components docs to style pure-react-carousel's components? 
 
-const ChangeSlideButtonWrapper = styled.span`
-    & button {
-        font-size: 1.2em;
-        padding: 10px;
-        border: none;
-    }
-`
+// const ChangeSlideButtonWrapper = styled.span`
+//     & button {
+//         font-size: 1.2em;
+//         padding: 10px;
+//         border: none;
+//     }
+// `
 const CloseCarouselBtn = styled.button`
     position: absolute;
     top: 0;
@@ -25,6 +25,8 @@ const CloseCarouselBtn = styled.button`
     opacity: .5;
     background: none;
     border: none;
+    /* TODO: change back to black (ie no color) when you fix carousel buttons to be positioned relative to image width */
+    color: azure;
     &:hover {
         cursor: pointer;
         background: rgb(11, 18, 11);
@@ -36,19 +38,17 @@ export default function AlbumName({ albumImages }) {
     const [currentSlideIndex, setCurrentSlideIndex] = useState(null)
     const [carouselIsActive, setCarouselIsActive] = useState(false)
     // console.log(`albumImages: `, albumImages)
-    useEffect(() => {
-        document.body.style.overflow = 'hidden'
-        return () => document.body.style.overflow = 'initial'
-    }, [])
 
     function handleOpenCarousel(e, imgData) {
         setCurrentSlideIndex(imgData.index)
         setCarouselIsActive(true)
+        document.body.style.overflow = 'hidden'
     }
 
     function handleCloseCarousel() {
         setCurrentSlideIndex(null)
         setCarouselIsActive(false)
+        document.body.style.overflow = 'initial'
     }
 
     return (
@@ -155,18 +155,17 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params: { albumCollection, albumName } }) {
     const { resources: albumImages } = await getPhotoAlbum(albumCollection, albumName) 
     console.log(`albumImages.length: `, albumImages.length)
-    let context
     const baseImageUrl = 'http://res.cloudinary.com/daeedgezj/image/upload'
     const albumImagesSerialized = albumImages
         .filter(image => {
-            // TODO: Add test for when no context exists
-            context = image?.context
-            if (!context || context.isPrivate) return false
+            const context = image?.context
+            if ( !context || context.isPrivate) {
+                return false
+            }
             return true
         })
         .map(image => {
-            console.log(`image.url: `, image.url)
-
+            const { context } = image
             // const lqipUrl = cloudinary.url(image.public_id, {transformation: [
             //     {quality: "auto", fetch_format: "auto"},
             //     {effect: "blur:700", quality: 1},
@@ -177,8 +176,9 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
             const imagePathAndFormat = `${image.folder}/${image.filename}.${image.format}` 
             const fullImageUrl = `${baseImageOptimized}/${imagePathAndFormat}`
             // const lqipImageUrl = `${baseImageOptimized}/e_blur:1500,q_1/e_cartoonify/${imagePathAndFormat}`
-            // const date = context.date ? formatDate(context.date) : null
-            const date = context.date ? context.date : null
+            
+            // const date = context.date ? context.date : null
+            const date = context.date
             // NOTE: If you toggle lqip image or otherwise change the order of these properties you must also change the order of destructioning inside of the `handleOpenImageModal` function above
             return {
                 src: fullImageUrl,
@@ -188,7 +188,7 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
                 date: date,
                 width: image.width,
                 height: image.height,
-                alt: `Photo of ${context.display_location} on ${formatDate(date).toDateString()}`
+                alt: `Photo of ${context.display_location} on ${date}`
             }
         })
 
