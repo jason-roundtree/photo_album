@@ -154,18 +154,19 @@ export async function getStaticPaths() {
   
 export async function getStaticProps({ params: { albumCollection, albumName } }) {
     const { resources: albumImages } = await getPhotoAlbum(albumCollection, albumName) 
-    console.log(`albumImages.length: `, albumImages.length)
+    // console.log(`albumImages.length: `, albumImages.length)
     const baseImageUrl = 'http://res.cloudinary.com/daeedgezj/image/upload'
     const albumImagesSerialized = albumImages
         .filter(image => {
             const context = image?.context
-            if ( !context || context.isPrivate) {
+            if ( !context || context.isPrivate || !context.display_location) {
                 return false
             }
             return true
         })
         .map(image => {
-            const { context } = image
+            const { date, display_location = 'unknown' } = image.context
+            console.log(`display_location: `, display_location)
             // const lqipUrl = cloudinary.url(image.public_id, {transformation: [
             //     {quality: "auto", fetch_format: "auto"},
             //     {effect: "blur:700", quality: 1},
@@ -177,18 +178,16 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
             const fullImageUrl = `${baseImageOptimized}/${imagePathAndFormat}`
             // const lqipImageUrl = `${baseImageOptimized}/e_blur:1500,q_1/e_cartoonify/${imagePathAndFormat}`
             
-            // const date = context.date ? context.date : null
-            const date = context.date
             // NOTE: If you toggle lqip image or otherwise change the order of these properties you must also change the order of destructioning inside of the `handleOpenImageModal` function above
             return {
                 src: fullImageUrl,
                 // lqip_src: lqipUrl,
                 id: image.asset_id,
-                display_location: context.display_location || '',
+                display_location: display_location,
                 date: date,
                 width: image.width,
                 height: image.height,
-                alt: `Photo of ${context.display_location} on ${date}`
+                alt: `Photo of ${display_location} on ${date}`
             }
         })
 
