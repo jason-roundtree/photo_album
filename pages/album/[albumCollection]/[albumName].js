@@ -39,6 +39,11 @@ export default function AlbumName({ albumImages }) {
     const [carouselIsActive, setCarouselIsActive] = useState(false)
     // console.log(`albumImages: `, albumImages)
 
+    // Ensures overflow isn't hidden when browser back is selected while modal is open
+    useEffect(() => {
+        return () => document.body.style.overflow = 'initial'
+    })
+
     function handleOpenCarousel(e, imgData) {
         setCurrentSlideIndex(imgData.index)
         setCarouselIsActive(true)
@@ -159,14 +164,14 @@ export async function getStaticProps({ params: { albumCollection, albumName } })
     const albumImagesSerialized = albumImages
         .filter(image => {
             const context = image?.context
-            if ( !context || context.isPrivate || !context.display_location) {
+            if ( !context || context.isPrivate) {
                 return false
             }
             return true
         })
         .map(image => {
             const { date, display_location = 'unknown' } = image.context
-            console.log(`display_location: `, display_location)
+            // console.log(`display_location: `, display_location)
             // const lqipUrl = cloudinary.url(image.public_id, {transformation: [
             //     {quality: "auto", fetch_format: "auto"},
             //     {effect: "blur:700", quality: 1},
