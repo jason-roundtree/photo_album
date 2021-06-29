@@ -42,7 +42,7 @@ export default function AlbumName({ albumImages }) {
     // Ensures overflow isn't hidden when browser back is selected while modal is open
     useEffect(() => {
         return () => document.body.style.overflow = 'initial'
-    })
+    }, [])
 
     function handleOpenCarousel(e, imgData) {
         setCurrentSlideIndex(imgData.index)
