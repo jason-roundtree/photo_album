@@ -74,7 +74,7 @@ export default function AlbumName({ albumImages }) {
     return (
         <>
             <h2>{albumImages[0].display_location}</h2>
-            <h3>{formatDate(albumImages[0].date).toDateString()}</h3>
+            <h3>{formatDate(albumImages[0].date).monthAndYear}</h3>
             <Gallery 
                 photos={albumImages} 
                 margin={4}

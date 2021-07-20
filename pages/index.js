@@ -45,7 +45,7 @@ export default function Home({ previewData }) {
               return (
                 <li key={asset_id}>
                   <AlbumLocation>{context.display_location}</AlbumLocation>
-                  <AlbumDate>{formatDate(context.date).toDateString()}</AlbumDate>
+                  <AlbumDate>{formatDate(context.date).monthAndYear}</AlbumDate>
                   
                   <Link href={`/album/${folderPath}`}>
                     <a>
@@ -144,7 +144,7 @@ export async function getStaticProps() {
         date: date || '',
       }
   })
-  .sort((a, b) => formatDate(b.date) - formatDate(a.date))
+  .sort((a, b) => formatDate(b.date).dateObject - formatDate(a.date).dateObject)
 
   return {
     props: { 

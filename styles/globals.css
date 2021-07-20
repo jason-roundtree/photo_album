@@ -43,40 +43,9 @@ h1 {
 }
 
 .carousel.carousel {
-  /* display: flex; */
-  /* justify-content: center;
-  align-items: center;
-  position: relative; */
   width: 85vw;
-  /* height: 100%; */
-  /* max-height: 95vh; */
-  /* padding: 10px 0; */
 }
 
-/* .carousel.carousel div:not(.carousel__inner-slide) > div,
-.carousel.carousel ul,
-.carousel.carousel li {
-  height: 100%;
-  width: 100%;
-} */
-/* .carousel__slider.carousel__slider {
-  
-} */
-/* .carousel__slide.carousel__slide {
-  float: none;
-  height: 100%;
-} */
-/* .slideImage.slideImage { */
-  /* object-fit: contain; */
-  /* width: 100%; */
-  /* height: 100%; */
-  /* height: auto; */
-  /* height: 500px; */
-/* } */
-
-/* button {
-  background: red;
-} */
 .prev {
   padding: 1px 5px 1px 2px;
 }
