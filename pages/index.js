@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import Image from 'next/image'
+// import Image from 'next/image'
 import styled from 'styled-components'
 import formatDate from '../utils/formatDate'
-// TODO: which package should i be using? the commented out line below was working until adding 
-// const cloudinary = require('cloudinary').v2
 const cloudinary = require('cloudinary/lib/cloudinary').v2
 
 const AlbumLocation = styled.p` color: rgb(255, 51, 126); `

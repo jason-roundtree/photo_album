@@ -8,25 +8,40 @@ import formatDate from '../../../utils/formatDate'
 
 // TODO: Why can't I use the 'Styling Any Component' method from Styled Components docs to style pure-react-carousel's components? 
 
-// const ChangeSlideButtonWrapper = styled.span`
-//     & button {
-//         font-size: 1.2em;
-//         padding: 10px;
-//         border: none;
-//     }
-// `
+const ImageContainer = styled.div`
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    & img {
+        object-fit: contain;
+    }
+`
+const SlideNavBtnContainer = styled.div`
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    & button {
+        font-size: 1.5em;
+        opacity: .5;
+        color: azure;
+        background: rgb(11, 18, 11);
+        border: none;
+    }
+`
 const CloseCarouselBtn = styled.button`
     position: absolute;
-    top: 0;
-    right: 0;
-    margin: 5px;
+    bottom: 0;
+    color: azure;
+    margin: 10px 12px;
     padding: 1px 5px;
-    font-size: 1.25em;
-    opacity: .5;
+    font-size: 2.5em;
+    font-weight: 400;
+    opacity: .7;
     background: none;
     border: none;
-    /* TODO: change back to black (ie no color) when you fix carousel buttons to be positioned relative to image width */
-    color: azure;
     &:hover {
         cursor: pointer;
         background: rgb(11, 18, 11);
@@ -70,8 +85,8 @@ export default function AlbumName({ albumImages }) {
                 ? (
                     <div className='carousel-overlay'>
                         <CarouselProvider
-                            naturalSlideWidth={75}
-                            naturalSlideHeight={50}
+                            naturalSlideWidth={50}
+                            naturalSlideHeight={30}
                             totalSlides={albumImages.length}
                             currentSlide={currentSlideIndex}
                             className='carousel-provider'
@@ -79,27 +94,29 @@ export default function AlbumName({ albumImages }) {
                             <Slider>
                                 {albumImages.map((img, i) => {
                                     return (
-                                        <Slide key={img.id} className='slide'>
-                                            <PRC_Image 
-                                                src={img.src} 
-                                                alt={img.altText}
-                                                index={i}
-                                                id={img.id}
-                                                className='slideImage'
-                                            />
+                                        <Slide key={img.id}>
+                                            <ImageContainer>
+                                                <PRC_Image 
+                                                    src={img.src} 
+                                                    alt={img.altText}
+                                                    index={i}
+                                                    id={img.id}
+                                                    className='slideImage'
+                                                />
+
+                                                <SlideNavBtnContainer>
+                                                    <ButtonBack className='prev'>&#8678;</ButtonBack>
+                                                    <ButtonNext className='next'>&#8680;</ButtonNext>
+                                                </SlideNavBtnContainer>
+
+                                                <CloseCarouselBtn onClick={handleCloseCarousel}>
+                                                    &#215;
+                                                </CloseCarouselBtn>
+                                            </ImageContainer>
                                         </Slide>
                                     )
                                 })}
                             </Slider>
-                            
-                            <div className='carousel-nav-btn-container'>
-                                <ButtonBack className='prev'>&#8678;</ButtonBack>
-                                <ButtonNext className='next'>&#8680;</ButtonNext>
-                            </div>
-
-                            <CloseCarouselBtn onClick={handleCloseCarousel}>
-                                &#215;
-                            </CloseCarouselBtn>
                         </CarouselProvider>
                     </div>
                 )
