@@ -1,6 +1,6 @@
 # Personal Photoghraphy App
 
-## Tech 
+## Built With 
 - Next.js / React
 - Pure React Carousel
 - React Photo Gallery
@@ -8,12 +8,13 @@
 - Cloudinary Admin & Search APIs
 
 ## TODOs
-- Fix weird issue where you can see a small sliver of the previous/next carousel images
-- Move positioning of all carousel buttons relative to contained image width
-- Add more style to carousel
+- Add image loading placeholder to gallery and carousel
+- Move close carousel button to be fixed to upper right of screen (also do more debugging to figure out why it's such a pain to fight Pure-React-Carousel to position the carousel buttons relative to contained image width)
+- Hide carousel buttons until image is rendered
 - Add image numbers to carousel (e.g. 3/7)
-- Format dates differently (also maybe just show month and year??)
 - Find out how to sort or reorder images in Cloudinary by order pictures were taken or sort by time pictures were taken (is this only possible with paid plan??)
 - Ask Cloudinary if there's a way to get folder paths without using the Admin API
-- Add image loading placeholder
 - Add UI loader for when returning to main page from album
+- Add field to contextual metadata in Cloudinary for showing more info about the album location (e.g. region, mountain, etc.) and maybe another one for custom notes about the location (e.g. why there's poor image quality, weather conditions, etc)
+- Research why Next/Image was being slow and what can be done to help all around performance?
+- Add feature that allows users to easily download image with attribution?
