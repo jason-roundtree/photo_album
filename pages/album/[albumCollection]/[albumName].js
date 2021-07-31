@@ -32,8 +32,9 @@ const SlideNavBtnContainer = styled.div`
     }
 `
 const CloseCarouselBtn = styled.button`
-    position: absolute;
-    bottom: 0;
+    position: fixed;
+    top: 5px;
+    right: 10px;
     color: azure;
     margin: 10px 12px;
     padding: 1px 5px;
@@ -109,14 +110,15 @@ export default function AlbumName({ albumImages }) {
                                                     <ButtonNext className='next'>&#8680;</ButtonNext>
                                                 </SlideNavBtnContainer>
 
-                                                <CloseCarouselBtn onClick={handleCloseCarousel}>
-                                                    &#215;
-                                                </CloseCarouselBtn>
+                                                
                                             </ImageContainer>
                                         </Slide>
                                     )
                                 })}
                             </Slider>
+                            <CloseCarouselBtn onClick={handleCloseCarousel}>
+                                &#215;
+                            </CloseCarouselBtn>
                         </CarouselProvider>
                     </div>
                 )

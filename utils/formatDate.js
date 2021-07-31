@@ -13,7 +13,7 @@ export default function formatDate(dateStr) {
     const year = dateStr.slice(4, 6)
     // return `${monthName} 20${year}`
     const dateObject = new Date(`20${year}`, month, day)
-    console.log('dateObject: ', dateObject)
+    // console.log('dateObject: ', dateObject)
     return {
         dateObject: dateObject,
         monthAndYear: `${monthName} ${dateObject.getFullYear()}`
