@@ -1,7 +1,14 @@
 const cloudinary = require('cloudinary').v2
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { CarouselProvider, Slider, Slide, Image as PRC_Image, ButtonBack, ButtonNext, Dot } from 'pure-react-carousel'
+import { 
+    ButtonBack, 
+    ButtonNext,
+    CarouselProvider,
+    Image as PRC_Image, 
+    Slide,
+    Slider,
+} from 'pure-react-carousel'
 import 'pure-react-carousel/dist/react-carousel.es.css'
 import Gallery from 'react-photo-gallery'
 import formatDate from '../../../utils/formatDate'
